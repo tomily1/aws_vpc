@@ -89,3 +89,45 @@ resource "aws_security_group" "elb_security_group" {
     to_port = 0
   } ]
 }
+
+resource "aws_iam_role" "ec2_iam_role" {
+  name               = "EC2-IAM-Role"
+  assume_role_policy = <<EOF
+{
+  "Version": "2020-12-02"
+  "Statement":
+  [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Services": ["ec2.amazonaws.com", "application-autoscaling.amazonaws.com"]
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy" "ec2_iam_role_policy" {
+  name   = "EC2-IAM-Role-Policy"
+  role   = aws_iam_role.ec2_iam_role.id
+  policy = <<EOF
+{
+  "Version": "2020-12-02",
+  "Statement":
+  [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ec2:*",
+        "elasticloadbalancing:*",
+        "cloudwatch:*",
+        "logs:*"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+EOF
+}
