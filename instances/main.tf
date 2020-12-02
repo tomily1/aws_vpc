@@ -49,7 +49,7 @@ resource "aws_security_group" "ec2_private_security_group" {
   ingress = [ {
     from_port = 0
     protocol = "-1"
-    cidr_blocks = [ aws_security_group.ec2_public_security_group.id ]
+    security_groups = [ aws_security_group.ec2_public_security_group.id ]
     to_port = 0
   },
   {
@@ -139,7 +139,7 @@ resource "aws_iam_instance_profile" "ec2_instance_profile" {
 }
 
 data "aws_ami" "launch_configuration_ami" {
-  most_recent = true
+  most_recent = true # do not set to true but use custom ami so you don't destroy your instances everytime you launch.
 
   filter {
     name = "owner-alias"
@@ -148,7 +148,7 @@ data "aws_ami" "launch_configuration_ami" {
 }
 
 resource "aws_launch_configuration" "ec2_private_launch_configuration" {
-  image_id                    = data.aws_ami.launch_configuration_ami.id
+  image_id                    = "ami-09558250a3419e7d0"
   instance_type               = var.ec2_instance_type
   key_name                    = var.ec2_key_pair_name
   associate_public_ip_address = false
@@ -158,7 +158,7 @@ resource "aws_launch_configuration" "ec2_private_launch_configuration" {
   user_data = <<EOF
   #!/bin/bash
   yum update -y
-  yum install httpd24 -y
+  yum install httpd -y
   service httpd start
   chkconfig httpd on
   export INSTANCE_ID=$(curl http://169.254.169.254/latest/meta-data/instance-id)
@@ -167,7 +167,7 @@ EOF
 }
 
 resource "aws_launch_configuration" "ec2_public_launch_configuration" {
-  image_id                    = data.aws_ami.launch_configuration_ami.id
+  image_id                    = "ami-09558250a3419e7d0"
   instance_type               = var.ec2_instance_type
   key_name                    = var.ec2_key_pair_name
   associate_public_ip_address = true
@@ -177,7 +177,7 @@ resource "aws_launch_configuration" "ec2_public_launch_configuration" {
   user_data = <<EOF
   #!/bin/bash
   yum update -y
-  yum install httpd24 -y
+  yum install httpd -y
   service httpd start
   chkconfig httpd on
   export INSTANCE_ID=$(curl http://169.254.169.254/latest/meta-data/instance-id)
