@@ -320,3 +320,8 @@ resource "aws_autoscaling_policy" "backend_production_scaling_policy" {
     target_value = 80.0
   }
 }
+
+resource "aws_sns_topic" "webapp_production_autoscaling_alert_topic" {
+  display_name = "WebApp-AutoScaling-Topic"
+  name         = "WebApp-AutoScaling-Topic"
+}
