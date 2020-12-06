@@ -15,7 +15,7 @@ variable "ec2_instance_type" {
   description = "EC2 Instance type to launch"
 }
 
-variable "key_pair_name" {
+variable "ec2_key_pair_name" {
   default = "myEC2Keypair"
   description = "Keypair to use to connect to EC2 Instances"
 }
