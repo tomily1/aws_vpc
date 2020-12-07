@@ -36,7 +36,7 @@ resource "aws_security_group" "ec2_public_security_group" {
 
   egress {
     from_port = 0
-    ipv6_cidr_blocks = [ "0.0.0.0/0" ]
+    cidr_blocks = [ "0.0.0.0/0" ]
     protocol = "-1"
     to_port = 0
   }
@@ -64,7 +64,7 @@ resource "aws_security_group" "ec2_private_security_group" {
 
   egress {
     from_port = 0
-    ipv6_cidr_blocks = [ "0.0.0.0/0" ]
+    cidr_blocks = [ "0.0.0.0/0" ]
     protocol = "-1"
     to_port = 0
   }
@@ -96,15 +96,15 @@ resource "aws_iam_role" "ec2_iam_role" {
   name               = "EC2-IAM-Role"
   assume_role_policy = <<EOF
 {
-  "Version": "2020-12-02",
-  "Statement":
+  "Version" : "2012-10-17",
+  "Statement" :
   [
     {
-      "Effect": "Allow",
-      "Principal": {
-        "Services": ["ec2.amazonaws.com", "application-autoscaling.amazonaws.com"]
+      "Effect" : "Allow",
+      "Principal" : {
+        "Service" : ["ec2.amazonaws.com", "application-autoscaling.amazonaws.com"]
       },
-      "Action": "sts:AssumeRole"
+      "Action" : "sts:AssumeRole"
     }
   ]
 }
@@ -116,9 +116,8 @@ resource "aws_iam_role_policy" "ec2_iam_role_policy" {
   role   = aws_iam_role.ec2_iam_role.id
   policy = <<EOF
 {
-  "Version": "2020-12-02",
-  "Statement":
-  [
+  "Version" : "2012-10-17",
+  "Statement" : [
     {
       "Effect": "Allow",
       "Action": [
@@ -151,7 +150,7 @@ data "aws_ami" "launch_configuration_ami" {
 }
 
 resource "aws_launch_configuration" "ec2_private_launch_configuration" {
-  image_id                    = "ami-09558250a3419e7d0"
+  image_id                    = "ami-0ce1e3f77cd41957e"
   instance_type               = var.ec2_instance_type
   key_name                    = var.ec2_key_pair_name
   associate_public_ip_address = false
@@ -170,7 +169,7 @@ EOF
 }
 
 resource "aws_launch_configuration" "ec2_public_launch_configuration" {
-  image_id                    = "ami-09558250a3419e7d0"
+  image_id                    = "ami-0ce1e3f77cd41957e"
   instance_type               = var.ec2_instance_type
   key_name                    = var.ec2_key_pair_name
   associate_public_ip_address = true
@@ -281,6 +280,8 @@ resource "aws_autoscaling_group" "ec2_public_autoscaling_group" {
   launch_configuration = aws_launch_configuration.ec2_public_launch_configuration.name
   health_check_type = "ELB"
   load_balancers = [ aws_elb.webapp_load_balancer.name ]
+
+  depends_on = [aws_launch_configuration.ec2_public_launch_configuration]
 
   tags = [
     {
