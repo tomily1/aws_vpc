@@ -50,7 +50,7 @@ resource "aws_security_group" "ec2_private_security_group" {
   ingress {
     from_port = 0
     protocol = "-1"
-    security_groups = [ aws_security_group.ec2_public_security_group.id ]
+    cidr_blocks = [ "10.0.0.7", "10.0.0.8", "10.0.0.9" ]
     to_port = 0
   }
 
